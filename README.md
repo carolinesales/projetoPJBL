@@ -1,6 +1,5 @@
 ﻿# Projeto PJBL
-
-Sistema de Administração de Condomínio
+ 
 Este projeto é um Sistema de Administração de Condomínio desenvolvido em Java. O sistema permite o gerenciamento de moradores de um condomínio, oferecendo funcionalidades básicas como:
 
 Cadastro de moradores: Permite registrar o nome, unidade e telefone dos moradores.
