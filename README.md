@@ -9,3 +9,5 @@ Exclusão de moradores: Permite remover moradores da lista de registros.
 Tecnologias Utilizadas
 
 Java: Linguagem de programação utilizada para o desenvolvimento do sistema.
+
+Alunos: Caroline Videira Sales, Marcela Fabri Karam, João Vitor Dadas de Oliveira
