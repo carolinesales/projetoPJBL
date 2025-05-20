@@ -1,13 +1,19 @@
-package src;
+package teste;
 
-public class ReservaAreaComum extends Inquilino {
+import src.Inquilino;
 
-    public Inquilino(String nome, String apartamento, String telefone) {
-        super(nome, apartamento, telefone);
+public class ReservaAreaComum {
+    private Inquilino inquilino;
+    private String dataReserva;
+    private String horaReserva;
+    private String areaComum;
+
+    public ReservaAreaComum(String nome, String apartamento, String telefone) {
+        this.inquilino = new Inquilino(nome, apartamento, telefone);
     }
 
-    @Override
     public void exibirInformacoes() {
-        System.out.println("Inquilino: " + nome + ", Apartamento: " + apartamento + ", Telefone: " + telefone);
+        System.out.println("Reserva feita por:");
+        inquilino.exibirInformacoes();
     }
-} 
+}
