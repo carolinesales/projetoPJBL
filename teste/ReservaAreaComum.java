@@ -8,6 +8,6 @@ public class ReservaAreaComum extends Inquilino {
 
     @Override
     public void exibirInformacoes() {
-        System.out.println("Morador: " + nome + "Inquilino: " + nome + ", Apartamento: " + apartamento + ", Telefone: " + telefone);
+        System.out.println("Inquilino: " + nome + ", Apartamento: " + apartamento + ", Telefone: " + telefone);
     }
 } 
