@@ -1,5 +1,10 @@
 package src;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,5 +59,35 @@ public class Condominio {
 
     public List<Despesa> getDespesas() {
         return despesas;
+    }
+
+    public void salvarDespesasCSV() throws IOException, CondominioException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("despesas.csv"))) {
+            for (Despesa despesa : despesas) {
+                writer.write(despesa.getTipo() + "," + despesa.getValor() + "," + despesa.getData());
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            throw new CondominioException("Erro ao salvar arquivo de despesas: " + e.getMessage());
+        }
+    }
+
+    public void carregarDespesasCSV() throws IOException, CondominioException {
+        despesas.clear(); // Limpa a lista para evitar duplicatas
+        try (BufferedReader reader = new BufferedReader(new FileReader("despesas.csv"))) {
+            String linha;
+            while ((linha = reader.readLine()) != null) {
+                String[] partes = linha.split(",");
+                if (partes.length != 3) {
+                    throw new CondominioException("Formato inválido no arquivo de despesas.");
+                }
+                String tipo = partes[0];
+                double valor = Double.parseDouble(partes[1]);
+                LocalDate data = LocalDate.parse(partes[2]);
+                despesas.add(new Despesa(tipo, valor, data));
+            }
+        } catch (IOException | NumberFormatException | java.time.format.DateTimeParseException e) {
+            throw new CondominioException("Erro ao carregar arquivo de despesas: " + e.getMessage());
+        }
     }
 }
