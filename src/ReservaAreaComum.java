@@ -2,18 +2,17 @@ package src;
 
 public class ReservaAreaComum {
     private Inquilino inquilino;
-    private String dataReserva;  
-    private String horaReserva; 
+    private String dataReserva;
+    private String horaReserva;
     private String areaComum;
 
-    public ReservaAreaComum(String nome, String apartamento, String telefone,
+    public ReservaAreaComum(String nome, String cpf, String apartamento, String telefone,
                             String dataReserva, String horaReserva, String areaComum) {
-        this.inquilino = new Inquilino(nome, apartamento, telefone);
+        this.inquilino = new Inquilino(nome, cpf, apartamento, telefone);
         this.dataReserva = dataReserva;
         this.horaReserva = horaReserva;
         this.areaComum = areaComum;
     }
-
 
     public Inquilino getInquilino() {
         return inquilino;
@@ -31,7 +30,6 @@ public class ReservaAreaComum {
         return areaComum;
     }
 
-    // Setters
     public void setDataReserva(String dataReserva) {
         this.dataReserva = dataReserva;
     }
@@ -44,7 +42,6 @@ public class ReservaAreaComum {
         this.areaComum = areaComum;
     }
 
-   
     public void exibirInformacoes() {
         System.out.println("Reserva de Área Comum:");
         System.out.println("Área: " + areaComum);

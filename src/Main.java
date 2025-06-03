@@ -11,10 +11,11 @@ public class Main {
             System.out.println("Menu:");
             System.out.println("1. Cadastrar Morador");
             System.out.println("2. Exibir Moradores");
-            System.out.println("3. Sair");
+            System.out.println("3. Exibir Apartamentos");
+            System.out.println("4. Sair");
             System.out.print("Escolha uma opção: ");
             int opcao = scanner.nextInt();
-            scanner.nextLine(); 
+            scanner.nextLine();
 
             switch (opcao) {
                 case 1:
@@ -24,6 +25,9 @@ public class Main {
                     cadastro.exibirMoradores();
                     break;
                 case 3:
+                    cadastro.exibirApartamentos();
+                    break;
+                case 4:
                     System.out.println("Saindo...");
                     return;
                 default:
