@@ -31,7 +31,7 @@ public class Main {
             System.out.println("13. Carregar moradores de arquivo CSV"); // ✅ nova opção
             System.out.print("Escolha uma opção: ");
             int opcao = scanner.nextInt();
-            scanner.nextLine(); // consumir quebra de linha
+            scanner.nextLine(); 
 
             switch (opcao) {
                 case 1:
