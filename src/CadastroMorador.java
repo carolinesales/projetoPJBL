@@ -1,10 +1,14 @@
 package src;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class CadastroMorador {
+public class CadastroMorador implements Serializable {
     private List<Morador> moradores;
     private List<Apartamento> apartamentos;
 
@@ -13,6 +17,7 @@ public class CadastroMorador {
         apartamentos = new ArrayList<>();
     }
 
+    // ✅ Método para cadastrar manualmente
     public void cadastrarMorador() {
         Scanner scanner = new Scanner(System.in);
 
@@ -23,7 +28,7 @@ public class CadastroMorador {
         String cpf = scanner.nextLine();
 
         System.out.print("Digite o número do apartamento: ");
-        String apartamento = scanner.nextLine();
+        String numeroApartamento = scanner.nextLine();
 
         System.out.print("Digite o telefone do morador: ");
         String telefone = scanner.nextLine();
@@ -31,27 +36,70 @@ public class CadastroMorador {
         System.out.print("O morador é proprietário ou inquilino? (P/I): ");
         String tipo = scanner.nextLine();
 
-        Morador morador = null;
-        if (tipo.equalsIgnoreCase("P")) {
-            morador = new Proprietario(nome, cpf, apartamento, telefone);
-        } else if (tipo.equalsIgnoreCase("I")) {
-            morador = new Inquilino(nome, cpf, apartamento, telefone);
-        }
+        Morador morador = criarMorador(nome, cpf, numeroApartamento, telefone, tipo);
 
         if (morador != null) {
-            moradores.add(morador);
-            // Associar ao apartamento
-            Apartamento apt = apartamentos.stream()
-                    .filter(a -> a.getNumero().equals(apartamento))
-                    .findFirst()
-                    .orElse(new Apartamento(apartamento));
-            apt.setMorador(morador);
-            if (!apartamentos.contains(apt)) {
-                apartamentos.add(apt);
-            }
+            adicionarMoradorAoSistema(morador);
             System.out.println("Morador cadastrado com sucesso!");
         } else {
             System.out.println("Tipo de morador inválido.");
+        }
+    }
+
+    // ✅ Novo método: carregar moradores de um CSV
+    public void carregarMoradoresDeCSV(String caminhoArquivo) {
+        try (BufferedReader br = new BufferedReader(new FileReader(caminhoArquivo))) {
+            String linha;
+            while ((linha = br.readLine()) != null) {
+                String[] partes = linha.split(",");
+                if (partes.length != 5) {
+                    System.out.println("Linha inválida (esperado: nome,cpf,apartamento,tipo,telefone): " + linha);
+                    continue;
+                }
+
+                String nome = partes[0];
+                String cpf = partes[1];
+                String apartamento = partes[2];
+                String tipo = partes[3];
+                String telefone = partes[4];
+
+                Morador morador = criarMorador(nome, cpf, apartamento, telefone, tipo);
+
+                if (morador != null) {
+                    adicionarMoradorAoSistema(morador);
+                }
+            }
+            System.out.println("Moradores carregados com sucesso do arquivo!");
+        } catch (IOException e) {
+            System.out.println("Erro ao ler o arquivo CSV: " + e.getMessage());
+        }
+    }
+
+    // 🔄 Método utilitário: cria o objeto Proprietário ou Inquilino
+    private Morador criarMorador(String nome, String cpf, String apartamento, String telefone, String tipo) {
+        if (tipo.equalsIgnoreCase("P")) {
+            return new Proprietario(nome, cpf, apartamento, telefone);
+        } else if (tipo.equalsIgnoreCase("I")) {
+            return new Inquilino(nome, cpf, apartamento, telefone);
+        } else {
+            return null;
+        }
+    }
+
+    // 🔄 Método utilitário: adiciona morador à lista e vincula ao apartamento
+    private void adicionarMoradorAoSistema(Morador morador) {
+        moradores.add(morador);
+
+        // procurar apartamento existente ou criar novo
+        Apartamento apt = apartamentos.stream()
+                .filter(a -> a.getNumero().equals(morador.getApartamento()))
+                .findFirst()
+                .orElse(new Apartamento(morador.getApartamento()));
+
+        apt.setMorador(morador);
+
+        if (!apartamentos.contains(apt)) {
+            apartamentos.add(apt);
         }
     }
 
