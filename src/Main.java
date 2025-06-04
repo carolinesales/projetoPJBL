@@ -37,20 +37,18 @@ public class Main {
                 case 1:
                     cadastroMorador.cadastrarMorador();
                     condominio.adicionarApartamento(
-                        cadastroMorador.getApartamentos().get(cadastroMorador.getApartamentos().size() - 1)
-                    );
+                            cadastroMorador.getApartamentos().get(cadastroMorador.getApartamentos().size() - 1));
                     break;
 
                 case 2:
                     cadastroInquilino.cadastrarInquilino();
                     Morador inquilino = cadastroInquilino.getInquilinos().get(
-                        cadastroInquilino.getInquilinos().size() - 1
-                    );
+                            cadastroInquilino.getInquilinos().size() - 1);
                     cadastroMorador.getMoradores().add(inquilino);
                     Apartamento apt = cadastroMorador.getApartamentos().stream()
-                        .filter(a -> a.getNumero().equals(inquilino.getApartamento()))
-                        .findFirst()
-                        .orElse(new Apartamento(inquilino.getApartamento()));
+                            .filter(a -> a.getNumero().equals(inquilino.getApartamento()))
+                            .findFirst()
+                            .orElse(new Apartamento(inquilino.getApartamento()));
                     apt.setMorador(inquilino);
                     if (!cadastroMorador.getApartamentos().contains(apt)) {
                         cadastroMorador.getApartamentos().add(apt);
@@ -169,6 +167,17 @@ public class Main {
                     System.out.print("Digite o caminho do arquivo CSV: ");
                     String caminho = scanner.nextLine();
                     cadastroMorador.carregarMoradoresDeCSV(caminho);
+                    break;
+                case 14:
+                    System.out.print("Digite o nome do arquivo para salvar (ex: moradores.ser): ");
+                    String arqSalvar = scanner.nextLine();
+                    cadastroMorador.salvarMoradores(arqSalvar);
+                    break;
+
+                case 15:
+                    System.out.print("Digite o nome do arquivo para carregar (ex: moradores.ser): ");
+                    String arqCarregar = scanner.nextLine();
+                    cadastroMorador.carregarMoradoresSalvos(arqCarregar);
                     break;
 
                 default:

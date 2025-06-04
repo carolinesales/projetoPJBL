@@ -1,9 +1,6 @@
 package src;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -46,7 +43,7 @@ public class CadastroMorador implements Serializable {
         }
     }
 
-    // ✅ Novo método: carregar moradores de um CSV
+    // ✅ Carregar moradores de um CSV
     public void carregarMoradoresDeCSV(String caminhoArquivo) {
         try (BufferedReader br = new BufferedReader(new FileReader(caminhoArquivo))) {
             String linha;
@@ -75,7 +72,35 @@ public class CadastroMorador implements Serializable {
         }
     }
 
-    // 🔄 Método utilitário: cria o objeto Proprietário ou Inquilino
+    // ✅ Salvar moradores em um arquivo .ser
+    public void salvarMoradores(String caminhoArquivo) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(caminhoArquivo))) {
+            oos.writeObject(moradores);
+            System.out.println("Moradores salvos com sucesso!");
+        } catch (IOException e) {
+            System.out.println("Erro ao salvar moradores: " + e.getMessage());
+        }
+    }
+
+    // ✅ Carregar moradores salvos de um arquivo .ser
+    @SuppressWarnings("unchecked")
+    public void carregarMoradoresSalvos(String caminhoArquivo) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(caminhoArquivo))) {
+            moradores = (List<Morador>) ois.readObject();
+
+            // Recriar apartamentos e associar moradores
+            apartamentos.clear();
+            for (Morador morador : moradores) {
+                Apartamento apt = new Apartamento(morador.getApartamento(), morador);
+                apartamentos.add(apt);
+            }
+
+            System.out.println("Moradores carregados com sucesso do arquivo!");
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Erro ao carregar moradores: " + e.getMessage());
+        }
+    }
+
     private Morador criarMorador(String nome, String cpf, String apartamento, String telefone, String tipo) {
         if (tipo.equalsIgnoreCase("P")) {
             return new Proprietario(nome, cpf, apartamento, telefone);
@@ -86,11 +111,9 @@ public class CadastroMorador implements Serializable {
         }
     }
 
-    // 🔄 Método utilitário: adiciona morador à lista e vincula ao apartamento
     private void adicionarMoradorAoSistema(Morador morador) {
         moradores.add(morador);
 
-        // procurar apartamento existente ou criar novo
         Apartamento apt = apartamentos.stream()
                 .filter(a -> a.getNumero().equals(morador.getApartamento()))
                 .findFirst()
