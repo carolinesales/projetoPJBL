@@ -28,6 +28,7 @@ public class Main {
             System.out.println("10. Total de Despesas no Mês");
             System.out.println("11. Abrir Interface Gráfica");
             System.out.println("12. Sair");
+            System.out.println("13. Carregar moradores de arquivo CSV"); // ✅ nova opção
             System.out.print("Escolha uma opção: ");
             int opcao = scanner.nextInt();
             scanner.nextLine(); // consumir quebra de linha
@@ -163,6 +164,12 @@ public class Main {
                 case 12:
                     System.out.println("Saindo...");
                     return;
+
+                case 13:
+                    System.out.print("Digite o caminho do arquivo CSV: ");
+                    String caminho = scanner.nextLine();
+                    cadastroMorador.carregarMoradoresDeCSV(caminho);
+                    break;
 
                 default:
                     System.out.println("Opção inválida.");
