@@ -30,35 +30,33 @@ public class Main {
             System.out.println("12. Sair");
             System.out.print("Escolha uma opção: ");
             int opcao = scanner.nextInt();
-            scanner.nextLine();
+            scanner.nextLine(); // consumir quebra de linha
 
             switch (opcao) {
                 case 1:
-                    try {
-                        cadastroMorador.cadastrarMorador();
-                        condominio.adicionarApartamento(cadastroMorador.getApartamentos().get(cadastroMorador.getApartamentos().size() - 1));
-                    } catch (CondominioException ex) {
-                        System.out.println("Erro: " + ex.getMessage());
-                    }
+                    cadastroMorador.cadastrarMorador();
+                    condominio.adicionarApartamento(
+                        cadastroMorador.getApartamentos().get(cadastroMorador.getApartamentos().size() - 1)
+                    );
                     break;
+
                 case 2:
-                    try {
-                        cadastroInquilino.cadastrarInquilino();
-                        Morador inquilino = cadastroInquilino.getInquilinos().get(cadastroInquilino.getInquilinos().size() - 1);
-                        cadastroMorador.getMoradores().add(inquilino);
-                        Apartamento apt = cadastroMorador.getApartamentos().stream()
-                                .filter(a -> a.getNumero().equals(inquilino.getApartamento()))
-                                .findFirst()
-                                .orElse(new Apartamento(inquilino.getApartamento()));
-                        apt.setMorador(inquilino);
-                        if (!cadastroMorador.getApartamentos().contains(apt)) {
-                            cadastroMorador.getApartamentos().add(apt);
-                            condominio.adicionarApartamento(apt);
-                        }
-                    } catch (CondominioException ex) {
-                        System.out.println("Erro: " + ex.getMessage());
+                    cadastroInquilino.cadastrarInquilino();
+                    Morador inquilino = cadastroInquilino.getInquilinos().get(
+                        cadastroInquilino.getInquilinos().size() - 1
+                    );
+                    cadastroMorador.getMoradores().add(inquilino);
+                    Apartamento apt = cadastroMorador.getApartamentos().stream()
+                        .filter(a -> a.getNumero().equals(inquilino.getApartamento()))
+                        .findFirst()
+                        .orElse(new Apartamento(inquilino.getApartamento()));
+                    apt.setMorador(inquilino);
+                    if (!cadastroMorador.getApartamentos().contains(apt)) {
+                        cadastroMorador.getApartamentos().add(apt);
+                        condominio.adicionarApartamento(apt);
                     }
                     break;
+
                 case 3:
                     try {
                         System.out.print("Digite o nome do funcionário: ");
@@ -66,16 +64,20 @@ public class Main {
                         if (nome.trim().isEmpty()) {
                             throw new CondominioException("Nome não pode estar vazio.");
                         }
+
                         System.out.print("Digite o CPF do funcionário: ");
                         String cpf = scanner.nextLine();
                         if (cpf.trim().isEmpty()) {
                             throw new CondominioException("CPF não pode estar vazio.");
                         }
+
                         System.out.print("Digite o telefone do funcionário: ");
                         String telefone = scanner.nextLine();
+
                         System.out.print("Digite o salário base do funcionário: ");
                         double salarioBase = scanner.nextDouble();
                         scanner.nextLine();
+
                         Funcionario funcionario = new Funcionario(nome, cpf, telefone, salarioBase);
                         funcionarios.add(funcionario);
                         System.out.println("Funcionário cadastrado com sucesso!");
@@ -83,12 +85,15 @@ public class Main {
                         System.out.println("Erro: " + ex.getMessage());
                     }
                     break;
+
                 case 4:
                     cadastroMorador.exibirMoradores();
                     break;
+
                 case 5:
                     cadastroInquilino.exibirInquilinos();
                     break;
+
                 case 6:
                     if (funcionarios.isEmpty()) {
                         System.out.println("Nenhum funcionário cadastrado.");
@@ -98,9 +103,11 @@ public class Main {
                         }
                     }
                     break;
+
                 case 7:
                     condominio.listarApartamentos();
                     break;
+
                 case 8:
                     try {
                         System.out.print("Digite o tipo da despesa: ");
@@ -108,14 +115,17 @@ public class Main {
                         if (tipo.trim().isEmpty()) {
                             throw new CondominioException("Tipo da despesa não pode estar vazio.");
                         }
+
                         System.out.print("Digite o valor da despesa: ");
                         double valor = scanner.nextDouble();
                         scanner.nextLine();
+
                         System.out.print("Digite a data (YYYY-MM-DD): ");
                         String dataStr = scanner.nextLine();
                         if (dataStr.trim().isEmpty()) {
                             throw new CondominioException("Data não pode estar vazia.");
                         }
+
                         LocalDate data = LocalDate.parse(dataStr);
                         condominio.adicionarDespesa(new Despesa(tipo, valor, data));
                         System.out.println("Despesa cadastrada com sucesso!");
@@ -123,9 +133,11 @@ public class Main {
                         System.out.println("Erro: " + ex.getMessage());
                     }
                     break;
+
                 case 9:
                     condominio.listarDespesas();
                     break;
+
                 case 10:
                     try {
                         System.out.print("Digite o mês (1-12): ");
@@ -133,20 +145,25 @@ public class Main {
                         if (mes < 1 || mes > 12) {
                             throw new CondominioException("Mês inválido (use 1-12).");
                         }
+
                         System.out.print("Digite o ano: ");
                         int ano = scanner.nextInt();
                         scanner.nextLine();
+
                         System.out.println("Total de despesas: R$" + condominio.calcularTotalDespesasMes(mes, ano));
                     } catch (CondominioException ex) {
                         System.out.println("Erro: " + ex.getMessage());
                     }
                     break;
+
                 case 11:
                     SwingUtilities.invokeLater(() -> new CondominioGUI(cadastroMorador, condominio).setVisible(true));
                     break;
+
                 case 12:
                     System.out.println("Saindo...");
                     return;
+
                 default:
                     System.out.println("Opção inválida.");
             }
