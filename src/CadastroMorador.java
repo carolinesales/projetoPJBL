@@ -14,7 +14,7 @@ public class CadastroMorador implements Serializable {
         apartamentos = new ArrayList<>();
     }
 
-    // ✅ Método para cadastrar manualmente
+    //  Método para cadastrar manualmente
     public void cadastrarMorador() {
         Scanner scanner = new Scanner(System.in);
 
@@ -43,7 +43,7 @@ public class CadastroMorador implements Serializable {
         }
     }
 
-    // ✅ Carregar moradores de um CSV
+    //  Carregar moradores de um CSV
     public void carregarMoradoresDeCSV(String caminhoArquivo) {
         try (BufferedReader br = new BufferedReader(new FileReader(caminhoArquivo))) {
             String linha;
@@ -72,7 +72,7 @@ public class CadastroMorador implements Serializable {
         }
     }
 
-    // ✅ Salvar moradores em um arquivo .ser
+    //  Salvar moradores em um arquivo .ser
     public void salvarMoradores(String caminhoArquivo) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(caminhoArquivo))) {
             oos.writeObject(moradores);
@@ -80,18 +80,17 @@ public class CadastroMorador implements Serializable {
         } catch (IOException e) {
             System.out.println("Erro ao salvar moradores: " + e.getMessage());
         }
-    }
-
-    // ✅ Carregar moradores salvos de um arquivo .ser
+}
     @SuppressWarnings("unchecked")
     public void carregarMoradoresSalvos(String caminhoArquivo) {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(caminhoArquivo))) {
             moradores = (List<Morador>) ois.readObject();
 
-            // Recriar apartamentos e associar moradores
+           
             apartamentos.clear();
             for (Morador morador : moradores) {
-                Apartamento apt = new Apartamento(morador.getApartamento(), morador);
+                Apartamento apt = new Apartamento(morador.getApartamento()); 
+                apt.setMorador(morador); 
                 apartamentos.add(apt);
             }
 
@@ -100,6 +99,7 @@ public class CadastroMorador implements Serializable {
             System.out.println("Erro ao carregar moradores: " + e.getMessage());
         }
     }
+
 
     private Morador criarMorador(String nome, String cpf, String apartamento, String telefone, String tipo) {
         if (tipo.equalsIgnoreCase("P")) {
