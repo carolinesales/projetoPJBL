@@ -81,21 +81,25 @@ public class DespesasGUI extends JFrame {
         JButton addButton = new JButton("Adicionar");
         JButton deleteButton = new JButton("Deletar");
         JButton saveCsvButton = new JButton("Salvar em CSV");
+        JButton clearButton = new JButton("Limpar Campos"); // Novo botão adicionado
         JButton closeButton = new JButton("Fechar");
 
         styleButton(addButton);
         styleButton(deleteButton);
         styleButton(saveCsvButton);
+        styleButton(clearButton); // Estilizar o novo botão
         styleButton(closeButton);
 
         addButton.addActionListener(e -> addDespesa());
         deleteButton.addActionListener(e -> deleteDespesa());
         saveCsvButton.addActionListener(e -> saveToCsv());
+        clearButton.addActionListener(e -> clearFields()); // Ação para o novo botão
         closeButton.addActionListener(e -> dispose());
 
         buttonPanel.add(addButton);
         buttonPanel.add(deleteButton);
         buttonPanel.add(saveCsvButton);
+        buttonPanel.add(clearButton); // Adicionar o novo botão ao painel
         buttonPanel.add(closeButton);
 
         gbc.gridx = 0; gbc.gridy = 3;
@@ -170,6 +174,13 @@ public class DespesasGUI extends JFrame {
         });
     }
 
+    // Novo método para limpar os campos de entrada
+    private void clearFields() {
+        tipoField.setText("");
+        valorField.setText("");
+        dataField.setText("");
+    }
+
     private void addDespesa() {
         try {
             String tipo = tipoField.getText().trim();
@@ -177,6 +188,8 @@ public class DespesasGUI extends JFrame {
                 JOptionPane.showMessageDialog(this, "Digite o tipo!", "Erro", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+
+ “
 
             String valorStr = valorField.getText().trim();
             if (valorStr.isEmpty()) {
