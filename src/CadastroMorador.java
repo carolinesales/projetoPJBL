@@ -1,11 +1,9 @@
 package src;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
-public class CadastroMorador implements Serializable {
+public class CadastroMorador {
     private List<Morador> moradores;
     private List<Apartamento> apartamentos;
 
@@ -14,143 +12,93 @@ public class CadastroMorador implements Serializable {
         apartamentos = new ArrayList<>();
     }
 
-    //  Método para cadastrar manualmente
-    public void cadastrarMorador() {
-        Scanner scanner = new Scanner(System.in);
-
-        System.out.print("Digite o nome do morador: ");
-        String nome = scanner.nextLine();
-
-        System.out.print("Digite o CPF do morador: ");
-        String cpf = scanner.nextLine();
-
-        System.out.print("Digite o número do apartamento: ");
-        String numeroApartamento = scanner.nextLine();
-
-        System.out.print("Digite o telefone do morador: ");
-        String telefone = scanner.nextLine();
-
-        System.out.print("O morador é proprietário ou inquilino? (P/I): ");
-        String tipo = scanner.nextLine();
-
-        Morador morador = criarMorador(nome, cpf, numeroApartamento, telefone, tipo);
-
-        if (morador != null) {
-            adicionarMoradorAoSistema(morador);
-            System.out.println("Morador cadastrado com sucesso!");
-        } else {
-            System.out.println("Tipo de morador inválido.");
+    public void cadastrarMorador(Morador morador) throws CondominioException {
+        if (morador == null) {
+            throw new CondominioException("Morador não pode ser nulo.");
         }
-    }
-
-    //  Carregar moradores de um CSV
-    public void carregarMoradoresDeCSV(String caminhoArquivo) {
-        try (BufferedReader br = new BufferedReader(new FileReader(caminhoArquivo))) {
-            String linha;
-            while ((linha = br.readLine()) != null) {
-                String[] partes = linha.split(",");
-                if (partes.length != 5) {
-                    System.out.println("Linha inválida (esperado: nome,cpf,apartamento,tipo,telefone): " + linha);
-                    continue;
-                }
-
-                String nome = partes[0];
-                String cpf = partes[1];
-                String apartamento = partes[2];
-                String tipo = partes[3];
-                String telefone = partes[4];
-
-                Morador morador = criarMorador(nome, cpf, apartamento, telefone, tipo);
-
-                if (morador != null) {
-                    adicionarMoradorAoSistema(morador);
-                }
+        for (Morador m : moradores) {
+            if (m.getCpf().equals(morador.getCpf())) {
+                throw new CondominioException("CPF já registrado.");
             }
-            System.out.println("Moradores carregados com sucesso do arquivo!");
-        } catch (IOException e) {
-            System.out.println("Erro ao ler o arquivo CSV: " + e.getMessage());
+        }
+        for (Apartamento apt : apartamentos) {
+            if (apt.getNumero().equals(morador.getApartamento()) && apt.getMorador() != null) {
+                throw new CondominioException("Apartamento já está ocupado.");
+            }
+        }
+        moradores.add(morador);
+        Apartamento apt = new Apartamento(morador.getApartamento());
+        apt.setMorador(morador);
+        apartamentos.add(apt);
+    }
+
+    public void cadastrarMorador() throws IOException, CondominioException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        System.out.print("Nome: ");
+        String nomeStr = reader.readLine();
+
+        System.out.print("CPF (11 dígitos): ");
+        String cpfStr = reader.readLine();
+
+        System.out.print("Apartamento: ");
+        String apartamentoStr = reader.readLine();
+
+        System.out.print("Telefone (10-11 dígitos): ");
+        String telefoneStr = reader.readLine();
+
+        System.out.print("Tipo (1 - Inquilino, 2 - Proprietário): ");
+        String tipoStr = reader.readLine();
+
+        Morador morador;
+        if (tipoStr.equals("1")) {
+            morador = new Inquilino(nomeStr, cpfStr, apartamentoStr, telefoneStr);
+        } else if (tipoStr.equals("2")) {
+            morador = new Proprietario(nomeStr, cpfStr, apartamentoStr, telefoneStr);
+        } else {
+            throw new CondominioException("Tipo de morador inválido.");
+        }
+
+        cadastrarMorador(morador);
+        System.out.println("Morador cadastrado com sucesso!");
+    }
+
+    public void exibirMoradores() {
+        if (moradores.isEmpty()) {
+            System.out.println("Não há moradores cadastrados.");
+            return;
+        }
+        for (Morador morador : moradores) {
+            morador.exibirInformacoes();
         }
     }
 
-    //  Salvar moradores em um arquivo .ser
-    public void salvarMoradores(String caminhoArquivo) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(caminhoArquivo))) {
-            oos.writeObject(moradores);
-            System.out.println("Moradores salvos com sucesso!");
-        } catch (IOException e) {
-            System.out.println("Erro ao salvar moradores: " + e.getMessage());
+    public void carregarMoradoresSalvos(String arquivo) {
+        File file = new File(arquivo);
+        if (!file.exists()) {
+            return;
         }
-}
-    @SuppressWarnings("unchecked")
-    public void carregarMoradoresSalvos(String caminhoArquivo) {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(caminhoArquivo))) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
             moradores = (List<Morador>) ois.readObject();
-
-           
             apartamentos.clear();
             for (Morador morador : moradores) {
-                Apartamento apt = new Apartamento(morador.getApartamento()); 
-                apt.setMorador(morador); 
+                Apartamento apt = new Apartamento(morador.getApartamento());
+                apt.setMorador(morador);
                 apartamentos.add(apt);
             }
-
-            System.out.println("Moradores carregados com sucesso do arquivo!");
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Erro ao carregar moradores: " + e.getMessage());
         }
     }
 
-
-    private Morador criarMorador(String nome, String cpf, String apartamento, String telefone, String tipo) {
-        if (tipo.equalsIgnoreCase("P")) {
-            return new Proprietario(nome, cpf, apartamento, telefone);
-        } else if (tipo.equalsIgnoreCase("I")) {
-            return new Inquilino(nome, cpf, apartamento, telefone);
-        } else {
-            return null;
+    public void salvarMoradores(String arquivo) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(arquivo))) {
+            oos.writeObject(moradores);
+        } catch (IOException e) {
+            System.out.println("Erro ao salvar moradores: " + e.getMessage());
         }
     }
 
-    private void adicionarMoradorAoSistema(Morador morador) {
-        moradores.add(morador);
-
-        Apartamento apt = apartamentos.stream()
-                .filter(a -> a.getNumero().equals(morador.getApartamento()))
-                .findFirst()
-                .orElse(new Apartamento(morador.getApartamento()));
-
-        apt.setMorador(morador);
-
-        if (!apartamentos.contains(apt)) {
-            apartamentos.add(apt);
-        }
-    }
-
-    public void exibirMoradores() {
-        if (moradores.isEmpty()) {
-            System.out.println("Nenhum morador cadastrado.");
-        } else {
-            for (Morador morador : moradores) {
-                morador.exibirInformacoes();
-            }
-        }
-    }
-
-    public void exibirApartamentos() {
-        if (apartamentos.isEmpty()) {
-            System.out.println("Nenhum apartamento cadastrado.");
-        } else {
-            for (Apartamento apartamento : apartamentos) {
-                apartamento.exibirInformacoes();
-            }
-        }
-    }
-
-    public List<Morador> getMoradores() {
-        return moradores;
-    }
-
-    public List<Apartamento> getApartamentos() {
-        return apartamentos;
-    }
+    public List<Morador> getMoradores() { return moradores; }
+    public List<Apartamento> getApartamentos() { return apartamentos; }
 }

@@ -1,10 +1,12 @@
 package src;
 
-public abstract class Morador {
-    protected String nome;
-    protected String apartamento;
-    protected String telefone;
-    protected String cpf; 
+import java.io.Serializable;
+
+public abstract class Morador implements Pagavel, Serializable {
+    private String nome;
+    private String cpf;
+    private String apartamento;
+    private String telefone;
 
     public Morador(String nome, String cpf, String apartamento, String telefone) {
         this.nome = nome;
@@ -17,6 +19,10 @@ public abstract class Morador {
         return nome;
     }
 
+    public String getCpf() {
+        return cpf;
+    }
+
     public String getApartamento() {
         return apartamento;
     }
@@ -25,12 +31,12 @@ public abstract class Morador {
         return telefone;
     }
 
-    public String getCpf() {
-        return cpf;
+    @Override
+    public String toString() {
+        return "Morador: " + nome + ", CPF: " + cpf + ", Apartamento: " + apartamento;
     }
 
     public abstract void exibirInformacoes();
-    public abstract double calcularPagamento();
 
     public String dados() {
         return "Nome: " + nome + "\nCPF: " + cpf + "\nApartamento: " + apartamento + "\nTelefone: " + telefone;

@@ -2,29 +2,32 @@ package src;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.text.SimpleDateFormat;
 import javax.swing.*;
 
-// tela para cadastro de moradores
-public class CadastroMoradorGUI extends JFrame {
-    private CadastroMorador cadastro;
-    private JTextField nomeField, cpfField, apartamentoField, telefoneField;
-    private JComboBox<String> tipoComboBox;
+//Tela para cadastro de reservas de áreas comuns
 
-    // cria a tela de cadastro de moradores
-    public CadastroMoradorGUI(CadastroMorador cadastro) {
-        this.cadastro = cadastro;
+public class ReservaAreaComumGUI extends JFrame {
+    private final CadastroReservas cadastroReservas;
+    private JTextField nomeField, cpfField, apartamentoField, telefoneField, dataField, horaField;
+    private JComboBox<String> areaComboBox;
+
+    //Cria a tela de cadastro de reservas
+
+    public ReservaAreaComumGUI(CadastroReservas cadastroReservas, CadastroMorador cadastroMorador) {
+        this.cadastroReservas = cadastroReservas;
         initializeUI();
     }
-
-    // inicializa a interface gráfica
+    //Inicializa a interface gráfica
+    //Define o título, tamanho, localização e comportamento de fechamento da janela
     private void initializeUI() {
-        setTitle("Cadastro de Morador");
-        setSize(400, 400);
-        setMinimumSize(new Dimension(350, 350));
+        setTitle("Cadastrar Reserva de Área Comum");
+        setSize(400, 500);
+        setMinimumSize(new Dimension(350, 450));
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        // cria um painel com layout GridBagLayout para organizar os componentes
+        //Cria um painel com layout GridBagLayout para organizar os componentes
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         panel.setBackground(new Color(245, 245, 245));
@@ -36,6 +39,7 @@ public class CadastroMoradorGUI extends JFrame {
         Font labelFont = new Font("Segoe UI", Font.PLAIN, 14);
         Font fieldFont = new Font("Segoe UI", Font.PLAIN, 14);
 
+        // cria os campos de entrada 
         // campo para nome
         JLabel nomeLabel = new JLabel("Nome:");
         nomeLabel.setFont(labelFont);
@@ -60,43 +64,61 @@ public class CadastroMoradorGUI extends JFrame {
         telefoneField = new JTextField(20);
         telefoneField.setFont(fieldFont);
 
-        // campo para tipo de morador (inquilino ou proprietário)
-        JLabel tipoLabel = new JLabel("Tipo:");
-        tipoLabel.setFont(labelFont);
-        tipoComboBox = new JComboBox<>(new String[]{"Inquilino", "Proprietário"});
-        tipoComboBox.setFont(fieldFont);
+        // campo para área comum
+        JLabel areaLabel = new JLabel("Área Comum:");
+        areaLabel.setFont(labelFont);
+        String[] areas = {"Salão de Festas", "Piscina", "Churrasqueira", "Academia"};
+        areaComboBox = new JComboBox<>(areas);
+        areaComboBox.setFont(fieldFont);
 
-        gbc.gridx = 0;
-        gbc.gridy = 0;
+        // campo para data
+        JLabel dataLabel = new JLabel("Data (DD/MM/AAAA):");
+        dataLabel.setFont(labelFont);
+        dataField = new JTextField(20);
+        dataField.setFont(fieldFont);
+
+        // campo para hora
+        JLabel horaLabel = new JLabel("Hora (HH:MM):");
+        horaLabel.setFont(labelFont);
+        horaField = new JTextField(20);
+        horaField.setFont(fieldFont);
+
+        gbc.gridx = 0; gbc.gridy = 0;
         panel.add(nomeLabel, gbc);
         gbc.gridx = 1;
         panel.add(nomeField, gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridx = 0; gbc.gridy = 1;
         panel.add(cpfLabel, gbc);
         gbc.gridx = 1;
         panel.add(cpfField, gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridx = 0; gbc.gridy = 2;
         panel.add(apartamentoLabel, gbc);
         gbc.gridx = 1;
         panel.add(apartamentoField, gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridx = 0; gbc.gridy = 3;
         panel.add(telefoneLabel, gbc);
         gbc.gridx = 1;
         panel.add(telefoneField, gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        panel.add(tipoLabel, gbc);
+        gbc.gridx = 0; gbc.gridy = 4;
+        panel.add(areaLabel, gbc);
         gbc.gridx = 1;
-        panel.add(tipoComboBox, gbc);
+        panel.add(areaComboBox, gbc);
 
-        // painel para os botões Salvar e Cancelar
+        gbc.gridx = 0; gbc.gridy = 5;
+        panel.add(dataLabel, gbc);
+        gbc.gridx = 1;
+        panel.add(dataField, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 6;
+        panel.add(horaLabel, gbc);
+        gbc.gridx = 1;
+        panel.add(horaField, gbc);
+
+        // Painel de botões
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.setBackground(new Color(245, 245, 245));
         JButton salvarButton = new JButton("Salvar");
@@ -105,14 +127,13 @@ public class CadastroMoradorGUI extends JFrame {
         styleButton(salvarButton);
         styleButton(cancelarButton);
 
-        salvarButton.addActionListener(e -> salvarMorador());
+        salvarButton.addActionListener(e -> salvarReserva());
         cancelarButton.addActionListener(e -> dispose());
 
         buttonPanel.add(cancelarButton);
         buttonPanel.add(salvarButton);
 
-        gbc.gridx = 0;
-        gbc.gridy = 5;
+        gbc.gridx = 0; gbc.gridy = 7;
         gbc.gridwidth = 2;
         panel.add(buttonPanel, gbc);
 
@@ -121,8 +142,7 @@ public class CadastroMoradorGUI extends JFrame {
         addInputValidation();
     }
 
-    // estilização dos botões
-
+    // estilização 
     private void styleButton(JButton button) {
         button.setFont(new Font("Segoe UI", Font.BOLD, 14));
         button.setBackground(button.getText().equals("Salvar") ? new Color(0, 123, 255) : new Color(220, 220, 220));
@@ -143,7 +163,7 @@ public class CadastroMoradorGUI extends JFrame {
         });
     }
 
-    // validação de entrada para CPF e telefone
+    // adiciona validação de entrada para os campos de CPF e telefone
     private void addInputValidation() {
         cpfField.addKeyListener(new KeyAdapter() {
             @Override
@@ -162,13 +182,15 @@ public class CadastroMoradorGUI extends JFrame {
         });
     }
 
-    // método para salvar o morador
-    private void salvarMorador() {
+    // metodo para salvar a reserva
+    private void salvarReserva() {
         try {
             if (nomeField.getText().trim().isEmpty() ||
                 cpfField.getText().trim().isEmpty() ||
                 apartamentoField.getText().trim().isEmpty() ||
-                telefoneField.getText().trim().isEmpty()) {
+                telefoneField.getText().trim().isEmpty() ||
+                dataField.getText().trim().isEmpty() ||
+                horaField.getText().trim().isEmpty()) {
                 throw new CondominioException("Todos os campos obrigatórios devem ser preenchidos.");
             }
             if (!cpfField.getText().matches("\\d{11}")) {
@@ -177,18 +199,23 @@ public class CadastroMoradorGUI extends JFrame {
             if (!telefoneField.getText().matches("\\d{10,11}")) {
                 throw new CondominioException("Telefone deve conter 10 ou 11 dígitos numéricos.");
             }
-            Morador morador = tipoComboBox.getSelectedItem().equals("Inquilino")
-                    ? new Inquilino(nomeField.getText(), cpfField.getText(),
-                                    apartamentoField.getText(), telefoneField.getText())
-                    : new Proprietario(nomeField.getText(), cpfField.getText(),
-                                       apartamentoField.getText(), telefoneField.getText());
-            cadastro.getMoradores().add(morador);
-            Apartamento apt = new Apartamento(apartamentoField.getText());
-            apt.setMorador(morador);
-            cadastro.getApartamentos().add(apt);
-            JOptionPane.showMessageDialog(this, "Morador cadastrado com sucesso!", 
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/mm/yyyy");
+            dateFormat.setLenient(false);
+            dateFormat.parse(dataField.getText());
+            if (!horaField.getText().matches("\\d{2}:\\d{2}")) {
+                throw new CondominioException("Hora deve estar no formato HH:MM");
+            }
+            String area = (String) areaComboBox.getSelectedItem();
+            ReservaAreaComum reserva = new ReservaAreaComum(
+                nomeField.getText(), cpfField.getText(), apartamentoField.getText(),
+                telefoneField.getText(), dataField.getText(), horaField.getText(), area);
+            cadastroReservas.adicionarReserva(reserva);
+            JOptionPane.showMessageDialog(this, "Reserva cadastrada com sucesso!", 
                                         "Sucesso", JOptionPane.INFORMATION_MESSAGE);
             dispose();
+        } catch (java.text.ParseException ex) {
+            JOptionPane.showMessageDialog(this, "Data inválida. Use o formato DD/MM/AAAA", 
+                                        "Erro", JOptionPane.ERROR_MESSAGE);
         } catch (CondominioException ex) {
             JOptionPane.showMessageDialog(this, "Erro: " + ex.getMessage(), 
                                         "Erro", JOptionPane.ERROR_MESSAGE);

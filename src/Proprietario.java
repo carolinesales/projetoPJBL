@@ -1,17 +1,20 @@
 package src;
 
-public class Proprietario extends Morador {
+import java.io.Serializable;
+
+public class Proprietario extends Morador implements Serializable {
     public Proprietario(String nome, String cpf, String apartamento, String telefone) {
         super(nome, cpf, apartamento, telefone);
     }
 
     @Override
     public void exibirInformacoes() {
-        System.out.println("Proprietário: " + nome + ", Apartamento: " + apartamento + ", Telefone: " + telefone + ", CPF: " + cpf);
+        System.out.printf("Proprietário: %s, CPF: %s, Apartamento: %s, Telefone: %s%n",
+                getNome(), getCpf(), getApartamento(), getTelefone());
     }
 
     @Override
     public double calcularPagamento() {
-        return 500.0; // Valor fixo para o pagamento do proprietário
+        return 500.0;
     }
 }
