@@ -79,7 +79,19 @@ public class CadastroMorador {
             return;
         }
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-            moradores = (List<Morador>) ois.readObject();
+            Object obj = ois.readObject();
+            if (obj instanceof List<?>) {
+                List<?> tempList = (List<?>) obj;
+                List<Morador> moradorList = new ArrayList<>();
+                for (Object o : tempList) {
+                    if (o instanceof Morador) {
+                        moradorList.add((Morador) o);
+                    }
+                }
+                moradores = moradorList;
+            } else {
+                moradores = new ArrayList<>();
+            }
             apartamentos.clear();
             for (Morador morador : moradores) {
                 Apartamento apt = new Apartamento(morador.getApartamento());
