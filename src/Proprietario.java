@@ -2,7 +2,7 @@ package src;
 
 import java.io.Serializable;
 
-public class Proprietario extends Morador implements Serializable {
+public class Proprietario extends Morador {
     public Proprietario(String nome, String cpf, String apartamento, String telefone) {
         super(nome, cpf, apartamento, telefone);
     }
