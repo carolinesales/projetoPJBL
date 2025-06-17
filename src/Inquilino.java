@@ -1,8 +1,6 @@
 package src;
 
-import java.io.Serializable;
-
-public class Inquilino extends Morador implements Serializable {
+public class Inquilino extends Morador {
     public Inquilino(String nome, String cpf, String apartamento, String telefone) {
         super(nome, cpf, apartamento, telefone);
     }

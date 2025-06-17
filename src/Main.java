@@ -386,8 +386,4 @@ private static void calcularTotalDespesasMes() {
         
     }
 
-    private static void carregarMoradoresSalvos() {
-        cadastroMorador.carregarMoradoresSalvos("moradores.ser");
-        System.out.println("Moradores carregados com sucesso!");
-    }
 }

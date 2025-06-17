@@ -1,6 +1,5 @@
 package src;
 
-import java.io.Serializable;
 
 public class Proprietario extends Morador {
     public Proprietario(String nome, String cpf, String apartamento, String telefone) {
