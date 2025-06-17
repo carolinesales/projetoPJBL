@@ -1,14 +1,11 @@
 package src;
 
 import java.io.*;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class CadastroReservas {
     private List<ReservaAreaComum> reservas;
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("d/M/yyyy", new Locale("pt", "BR"));
 
     public CadastroReservas() {
         reservas = new ArrayList<>();
