@@ -383,5 +383,11 @@ private static void calcularTotalDespesasMes() {
 
     private static void abrirInterfaceGrafica() {
         new CondominioGUI(cadastroMorador, condominio).setVisible(true);
+        
+    }
+
+    private static void carregarMoradoresSalvos() {
+        cadastroMorador.carregarMoradoresSalvos("moradores.ser");
+        System.out.println("Moradores carregados com sucesso!");
     }
 }
