@@ -9,7 +9,6 @@ import java.util.*;
 public class Condominio {
     private CadastroMorador cadastroMorador;
     private List<Apartamento> apartamentos = new ArrayList<>();
-    private List<Despesa> despesas = new ArrayList<>();
     private List<Funcionario> funcionarios = new ArrayList<>();
     private List<Tarefa> tarefas = new ArrayList<>();
     private CadastroReservas cadastroReservas;
@@ -34,13 +33,29 @@ public class Condominio {
         }
         despesas.add(despesa);
     }
+public class Despesa {
+    private String tipo;
+    private double valor;
+    private LocalDate data;
 
-    public void removerDespesa(String tipo, double valor, LocalDate data) throws CondominioException {
-        boolean removed = despesas.removeIf(d -> d.getTipo().equals(tipo) && d.getValor() == valor && d.getData().equals(data));
-        if (!removed) {
-            throw new CondominioException("Despesa não encontrada para remoção.");
-        }
+    public Despesa(String tipo, double valor, LocalDate data) {
+        this.tipo = tipo;
+        this.valor = valor;
+        this.data = data;
     }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public double getValor() {
+        return valor;
+    }
+
+    public LocalDate getData() {
+        return data;
+    }
+}
 
     public void adicionarFuncionario(Funcionario funcionario) throws CondominioException {
         if (funcionarios.stream().anyMatch(f -> f.getCpf().equals(funcionario.getCpf()))) {
@@ -99,6 +114,27 @@ public class Condominio {
             throw e;
         }
     }
+
+private List<Despesa> despesas = new ArrayList<>();
+
+public void removerDespesa(String tipo, double valor, LocalDate data) throws CondominioException {
+    Iterator<Despesa> iterator = despesas.iterator();
+    boolean removido = false;
+    while (iterator.hasNext()) {
+        Despesa despesa = iterator.next();
+        if (despesa.getTipo().equalsIgnoreCase(tipo) &&
+            Math.abs(despesa.getValor() - valor) < 0.01 &&
+            despesa.getData().equals(data)) {
+            iterator.remove();
+            removido = true;
+            System.out.println("Despesa removida: " + despesa);
+            break;
+        }
+    }
+    if (!removido) {
+        throw new CondominioException("Despesa não encontrada.");
+    }
+}
 
     public void carregarDespesasCSV() throws IOException, CondominioException {
         File file = new File("despesas.csv");

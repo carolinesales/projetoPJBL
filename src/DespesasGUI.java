@@ -1,7 +1,5 @@
 package src;
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
@@ -9,283 +7,224 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Locale;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
-/**
- * Tela para gerenciar despesas do condomínio.
- */
 public class DespesasGUI extends JFrame {
     private Condominio condominio;
-    private DefaultTableModel tableModel;
-    private JTable table;
     private JTextField tipoField, valorField, dataField;
+    private JTable tabela;
+    private DefaultTableModel model;
+    private JButton adicionarButton, removerButton, atualizarButton;
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("d/M/yyyy", new Locale("pt", "BR"));
 
-    /**
-     * Cria a tela de gerenciamento de despesas.
-     * @param condominio Instância do condomínio.
-     */
     public DespesasGUI(Condominio condominio) {
         this.condominio = condominio;
         initializeUI();
     }
 
     private void initializeUI() {
-        setTitle("Gerenciar Despesas");
-        setSize(600, 400);
-        setMinimumSize(new Dimension(500, 350));
-        setLocationRelativeTo(null);
+        setTitle("Gerenciamento de Despesas");
+        setSize(800, 600);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
 
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(new Color(245, 245, 245));
+        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        setContentPane(mainPanel);
 
-        JPanel inputPanel = new JPanel(new GridBagLayout());
-        inputPanel.setBackground(new Color(245, 245, 245));
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        JLabel tipoLabel = new JLabel("Tipo:");
-        tipoField = new JTextField(15);
+        JPanel inputPanel = new JPanel(new GridLayout(4, 2, 10, 10));
+        JLabel tipoLabel = new JLabel("Tipo da Despesa:");
+        tipoField = new JTextField(20);
         JLabel valorLabel = new JLabel("Valor (R$):");
-        valorField = new JTextField(15);
+        valorField = new JTextField(20);
         JLabel dataLabel = new JLabel("Data (DD/MM/YYYY):");
-        dataField = new JTextField(15);
+        dataField = new JTextField(20);
 
-        Font labelFont = new Font("Segoe UI", Font.PLAIN, 14);
-        Font fieldFont = new Font("Segoe UI", Font.PLAIN, 14);
-        tipoLabel.setFont(labelFont);
-        valorLabel.setFont(labelFont);
-        dataLabel.setFont(labelFont);
-        tipoField.setFont(fieldFont);
-        valorField.setFont(fieldFont);
-        dataField.setFont(fieldFont);
+        inputPanel.add(tipoLabel);
+        inputPanel.add(tipoField);
+        inputPanel.add(valorLabel);
+        inputPanel.add(valorField);
+        inputPanel.add(dataLabel);
+        inputPanel.add(dataField);
 
-        gbc.gridx = 0; gbc.gridy = 0;
-        inputPanel.add(tipoLabel, gbc);
-        gbc.gridx = 1;
-        inputPanel.add(tipoField, gbc);
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        adicionarButton = new JButton("Adicionar Despesa");
+        removerButton = new JButton("Remover Despesa");
+        atualizarButton = new JButton("Atualizar Tabela");
 
-        gbc.gridx = 0; gbc.gridy = 1;
-        inputPanel.add(valorLabel, gbc);
-        gbc.gridx = 1;
-        inputPanel.add(valorField, gbc);
+        styleButton(adicionarButton);
+        styleButton(removerButton);
+        styleButton(atualizarButton);
 
-        gbc.gridx = 0; gbc.gridy = 2;
-        inputPanel.add(dataLabel, gbc);
-        gbc.gridx = 1;
-        inputPanel.add(dataField, gbc);
+        buttonPanel.add(adicionarButton);
+        buttonPanel.add(removerButton);
+        buttonPanel.add(atualizarButton);
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        buttonPanel.setBackground(new Color(245, 245, 245));
-        JButton addButton = new JButton("Adicionar");
-        JButton deleteButton = new JButton("Deletar");
-        JButton saveCsvButton = new JButton("Salvar em CSV");
-        JButton clearButton = new JButton("Limpar Campos"); // Novo botão adicionado
-        JButton closeButton = new JButton("Fechar");
+        String[] colunas = {"Tipo", "Valor (R$)", "Data"};
+        model = new DefaultTableModel(colunas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        tabela = new JTable(model);
+        JScrollPane scrollPane = new JScrollPane(tabela);
+        tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        styleButton(addButton);
-        styleButton(deleteButton);
-        styleButton(saveCsvButton);
-        styleButton(clearButton); // Estilizar o novo botão
-        styleButton(closeButton);
+        mainPanel.add(inputPanel, BorderLayout.NORTH);
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
-        addButton.addActionListener(e -> addDespesa());
-        deleteButton.addActionListener(e -> deleteDespesa());
-        saveCsvButton.addActionListener(e -> saveToCsv());
-        clearButton.addActionListener(e -> clearFields()); // Ação para o novo botão
-        closeButton.addActionListener(e -> dispose());
+        adicionarButton.addActionListener(e -> adicionarDespesa());
+        removerButton.addActionListener(e -> removerDespesa());
+        atualizarButton.addActionListener(e -> atualizarTabela(model));
 
-        buttonPanel.add(addButton);
-        buttonPanel.add(deleteButton);
-        buttonPanel.add(saveCsvButton);
-        buttonPanel.add(clearButton); // Adicionar o novo botão ao painel
-        buttonPanel.add(closeButton);
+        atualizarTabela(model);
 
-        gbc.gridx = 0; gbc.gridy = 3;
-        gbc.gridwidth = 2;
-        inputPanel.add(buttonPanel, gbc);
-
-        String[] columns = {"Tipo", "Valor", "Data"};
-        tableModel = new DefaultTableModel(columns, 0);
-        table = new JTable(tableModel);
-        updateTable();
-
-        panel.add(inputPanel, BorderLayout.NORTH);
-        panel.add(new JScrollPane(table), BorderLayout.CENTER);
-
-        add(panel);
-
-        addInputValidation();
+        getRootPane().registerKeyboardAction(
+            e -> dispose(),
+            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+            JComponent.WHEN_IN_FOCUSED_WINDOW
+        );
     }
 
-    private void styleButton(JButton button) {
-        button.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        button.setBackground(button.getText().equals("Fechar") ? new Color(220, 220, 220) : new Color(0, 123, 255));
-        button.setForeground(button.getText().equals("Fechar") ? Color.BLACK : Color.WHITE);
-        button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
-        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        button.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                button.setBackground(button.getBackground().brighter());
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                button.setBackground(button.getText().equals("Fechar") ? new Color(220, 220, 220) : new Color(0, 123, 255));
-            }
-        });
-    }
-
-    private void addInputValidation() {
-        dataField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                char c = e.getKeyChar();
-                String text = dataField.getText();
-                if (!Character.isDigit(c) && c != '/' && c != KeyEvent.VK_BACK_SPACE && c != KeyEvent.VK_DELETE) {
-                    e.consume();
-                }
-                if (text.length() >= 10 && c != KeyEvent.VK_BACK_SPACE && c != KeyEvent.VK_DELETE) {
-                    e.consume();
-                }
-                if (text.length() == 2 || text.length() == 5) {
-                    if (c != '/' && c != KeyEvent.VK_BACK_SPACE && c != KeyEvent.VK_DELETE) {
-                        dataField.setText(text + "/");
-                    }
-                }
-            }
-        });
-
-        valorField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                char c = e.getKeyChar();
-                if (!Character.isDigit(c) && c != '.' && c != KeyEvent.VK_BACK_SPACE && c != KeyEvent.VK_DELETE) {
-                    e.consume();
-                }
-                String text = valorField.getText();
-                if (text.contains(".") && c == '.') {
-                    e.consume();
-                }
-            }
-        });
-    }
-
-    // Novo método para limpar os campos de entrada
-    private void clearFields() {
-        tipoField.setText("");
-        valorField.setText("");
-        dataField.setText("");
-    }
-
-    private void addDespesa() {
+    private void adicionarDespesa() {
         try {
             String tipo = tipoField.getText().trim();
             if (tipo.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Digite o tipo!", "Erro", JOptionPane.ERROR_MESSAGE);
-                return;
+                throw new CondominioException("Tipo da despesa não pode ser vazio.");
             }
 
- “
-
-            String valorStr = valorField.getText().trim();
-            if (valorStr.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Digite o valor!", "Erro", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
             double valor;
             try {
-                valor = Double.parseDouble(valorStr);
+                valor = Double.parseDouble(valorField.getText().trim());
                 if (valor <= 0) {
-                    JOptionPane.showMessageDialog(this, "Valor deve ser maior que zero!", "Erro", JOptionPane.ERROR_MESSAGE);
-                    return;
+                    throw new CondominioException("Valor deve ser maior que zero.");
                 }
             } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "Valor inválido!", "Erro", JOptionPane.ERROR_MESSAGE);
-                return;
+                throw new CondominioException("Valor inválido.");
             }
 
             String dataStr = dataField.getText().trim();
-            System.out.println("Data inserida: '" + dataStr + "' (tamanho: " + dataStr.length() + ")");
-            System.out.print("Caracteres: ");
-            for (char c : dataStr.toCharArray()) {
-                System.out.print("[" + c + "(" + (int) c + ")] ");
-            }
-            System.out.println();
             if (!dataStr.matches("\\d{1,2}/\\d{1,2}/\\d{4}")) {
-                JOptionPane.showMessageDialog(this, "Data inválida! Use DD/MM/YYYY (ex.: 25/06/2025 ou 5/6/2025).", "Erro", JOptionPane.ERROR_MESSAGE);
-                return;
+                throw new CondominioException("Data inválida! Use DD/MM/YYYY (ex.: 25/06/2025).");
             }
             LocalDate data;
             try {
                 data = LocalDate.parse(dataStr, DATE_FORMATTER);
-                System.out.println("Data parseada: " + data);
             } catch (DateTimeParseException e) {
-                JOptionPane.showMessageDialog(this, "Data inválida! Use DD/MM/YYYY (ex.: 25/06/2025 ou 5/6/2025). Erro: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-                return;
+                throw new CondominioException("Data inválida! Use DD/MM/YYYY (ex.: 25/06/2025).");
             }
 
-            Despesa despesa = new Despesa(tipo, valor, data);
+            Condominio.Despesa despesa = condominio.new Despesa(tipo, valor, data);
             condominio.adicionarDespesa(despesa);
-            updateTable();
+            condominio.salvarDespesasCSV();
+            atualizarTabela(model);
             JOptionPane.showMessageDialog(this, "Despesa adicionada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
 
             tipoField.setText("");
             valorField.setText("");
             dataField.setText("");
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Erro ao adicionar despesa: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+        } catch (CondominioException | IOException e) {
+            JOptionPane.showMessageDialog(this, "Erro: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void deleteDespesa() {
+private void removerDespesa() {
+    int selectedRow = tabela.getSelectedRow();
+    if (selectedRow >= 0) {
+        Object[] options = {"Sim", "Não"};
+        int confirm = JOptionPane.showOptionDialog(
+            this,
+            "Deseja remover a despesa selecionada?",
+            "Confirmação",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            options,
+            options[1]
+        );
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                String tipo = String.valueOf(model.getValueAt(selectedRow, 0));
+                String valorStr = String.valueOf(model.getValueAt(selectedRow, 1));
+                double valor = Double.parseDouble(valorStr.replace(",", "."));
+                String dataStr = String.valueOf(model.getValueAt(selectedRow, 2));
+                LocalDate data = LocalDate.parse(dataStr, DATE_FORMATTER);
+
+                System.out.println("Tentando remover: tipo=" + tipo + ", valor=" + valor + ", data=" + dataStr);
+
+                // Verificar se a despesa existe
+                boolean exists = false;
+                for (Condominio.Despesa d : condominio.getDespesas()) {
+                    if (d.getTipo().equalsIgnoreCase(tipo) &&
+                        Math.abs(d.getValor() - valor) < 0.01 &&
+                        d.getData().equals(data)) {
+                        exists = true;
+                        break;
+                    }
+                }
+                if (!exists) {
+                    throw new CondominioException("Despesa não encontrada na lista interna.");
+                }
+
+                condominio.removerDespesa(tipo, valor, data);
+                condominio.salvarDespesasCSV();
+                atualizarTabela(model);
+                JOptionPane.showMessageDialog(this, "Despesa removida com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Erro: Valor inválido na tabela.", "Erro", JOptionPane.ERROR_MESSAGE);
+            } catch (DateTimeParseException e) {
+                JOptionPane.showMessageDialog(this, "Erro: Data inválida na tabela.", "Erro", JOptionPane.ERROR_MESSAGE);
+            } catch (IOException | CondominioException e) {
+                JOptionPane.showMessageDialog(this, "Erro ao remover a despesa: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    } else {
+        JOptionPane.showMessageDialog(this, "Selecione uma despesa para remover.", "Erro", JOptionPane.ERROR_MESSAGE);
+    }
+}
+
+    private void atualizarTabela(DefaultTableModel model) {
         try {
-            int selectedRow = table.getSelectedRow();
-            if (selectedRow == -1) {
-                JOptionPane.showMessageDialog(this, "Selecione uma despesa na tabela!", "Erro", JOptionPane.ERROR_MESSAGE);
-                return;
+            condominio.carregarDespesasCSV();
+            model.setRowCount(0);
+            for (Condominio.Despesa despesa : condominio.getDespesas()) {
+                model.addRow(new Object[]{
+                    despesa.getTipo(),
+                    String.format("%.2f", despesa.getValor()),
+                    despesa.getData().format(DATE_FORMATTER)
+                });
+            }
+        } catch (IOException | CondominioException e) {
+            JOptionPane.showMessageDialog(this, "Erro ao atualizar tabela: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void styleButton(JButton button) {
+        button.setBackground(new Color(70, 130, 180));
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
+        button.setFont(new Font("Arial", Font.BOLD, 12));
+        button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                button.setBackground(new Color(100, 149, 237));
             }
 
-            String tipo = (String) tableModel.getValueAt(selectedRow, 0);
-            double valor = ((Number) tableModel.getValueAt(selectedRow, 1)).doubleValue();
-            String dataStr = (String) tableModel.getValueAt(selectedRow, 2);
-            LocalDate data = LocalDate.parse(dataStr, DATE_FORMATTER);
-
-            condominio.removerDespesa(tipo, valor, data);
-            updateTable();
-            JOptionPane.showMessageDialog(this, "Despesa deletada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-
-            tipoField.setText("");
-            valorField.setText("");
-            dataField.setText("");
-        } catch (CondominioException e) {
-            JOptionPane.showMessageDialog(this, e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Erro ao deletar despesa: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-        }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                button.setBackground(new Color(70, 130, 180));
+            }
+        });
     }
 
-    private void saveToCsv() {
-        try {
-            condominio.salvarDespesasCSV();
-            JOptionPane.showMessageDialog(this, "Despesas salvas com sucesso em despesas.csv!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Erro ao salvar despesas.csv: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-            System.err.println("Erro ao salvar despesas.csv: " + e.getMessage());
-        }
-    }
-
-    private void updateTable() {
-        tableModel.setRowCount(0);
-        for (Despesa despesa : condominio.getDespesas()) {
-            tableModel.addRow(new Object[]{
-                    despesa.getTipo(),
-                    despesa.getValor(),
-                    despesa.getData().format(DATE_FORMATTER)
-            });
-        }
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            Condominio condominio = new Condominio();
+            new DespesasGUI(condominio).setVisible(true);
+        });
     }
 }

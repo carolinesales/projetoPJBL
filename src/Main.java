@@ -181,7 +181,7 @@ public class Main {
         condominio.adicionarFuncionario(func);
         Tarefa tarefa = new Tarefa("Limpar piscina", LocalDate.now(), func);
         condominio.adicionarTarefa(tarefa);
-        Despesa despesa = new Despesa("Luz", 300.50, LocalDate.now());
+        Condominio.Despesa despesa = condominio.new Despesa("Luz", 300.50, LocalDate.now());
         condominio.adicionarDespesa(despesa);
         System.out.println("Dados de exemplo carregados com sucesso!");
     }
@@ -345,7 +345,7 @@ public class Main {
         } catch (DateTimeParseException e) {
             throw new CondominioException("Data inválida! Use DD/MM/YYYY (ex.: 25/06/2025 ou 5/6/2025). Erro: " + e.getMessage());
         }
-        Despesa despesa = new Despesa(tipoDespesa, valorDespesa, dataDespesa);
+        Condominio.Despesa despesa = condominio.new Despesa(tipoDespesa, valorDespesa, dataDespesa);
         condominio.adicionarDespesa(despesa);
         System.out.println("Despesa adicionada com sucesso!");
     }
